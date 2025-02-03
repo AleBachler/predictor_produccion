@@ -2,3 +2,6 @@ torch
 scikit-learn
 pandas
 streamlit
+thefuzz
+xlsxwriter
+openpyxl

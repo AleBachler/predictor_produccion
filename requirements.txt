@@ -1,0 +1,8 @@
+torch
+sklearn
+pandas
+streamlit
+io
+thefuzz
+xlsxwriter
+openpyxl

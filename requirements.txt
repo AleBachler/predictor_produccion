@@ -2,7 +2,4 @@ torch
 scikit-learn
 pandas
 streamlit
-io
-thefuzz
-xlsxwriter
-openpyxl
+

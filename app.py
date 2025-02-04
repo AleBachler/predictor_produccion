@@ -105,49 +105,49 @@ elif pagina == "Predecir":
     archivo = st.file_uploader("Sube un archivo Excel", type=["xls", "xlsx"])
 
     if archivo:
-    df = pd.read_excel(archivo)
-    df = convertir_objetos_a_numerico(df)
-
-    # Validar y corregir nombres de columnas
-    columnas_corregidas = corregir_nombres_columnas(df.columns, columnas_entrada)
+        df = pd.read_excel(archivo)
+        df = convertir_objetos_a_numerico(df)
     
-    # Aplicar los nombres corregidos
-    df.rename(columns=columnas_corregidas, inplace=True)
+        # Validar y corregir nombres de columnas
+        columnas_corregidas = corregir_nombres_columnas(df.columns, columnas_entrada)
+        
+        # Aplicar los nombres corregidos
+        df.rename(columns=columnas_corregidas, inplace=True)
+        
+            # Revisar si todas las columnas necesarias están presentes
+            if set(columnas_entrada).issubset(df.columns):
+                df = df[columnas_entrada]  # Seleccionar solo las columnas de entrada
+                
+                # Escalar los datos de entrada
+                X_scaled = scaler_X.transform(df.values)
+                X_tensor = torch.tensor(X_scaled, dtype=torch.float32)
+        
+                # Realizar predicciones escaladas
+                with torch.no_grad():
+                    y_scaled_pred = modelo(X_tensor).numpy().flatten()
+        
+                # Desescalar las predicciones
+                y_pred_desescalado = scaler_y.inverse_transform(y_scaled_pred.reshape(-1, 1)).flatten()
+        
+                # Agregar predicciones al DataFrame
+                df["Producción Total Estimada"] = y_pred_desescalado
+        
+                # Guardar el DataFrame con predicciones en un archivo Excel
+                output = io.BytesIO()
+                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                    df.to_excel(writer, index=False, sheet_name="Predicciones")
+                output.seek(0)
+        
+                # Botón para descargar el archivo Excel
+                st.download_button(
+                    label="Descargar Excel con predicciones",
+                    data=output,
+                    file_name="predicciones.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+        
+                st.success("Predicciones generadas con éxito. Descarga el archivo con el botón de arriba.")
+            else:
+                st.error(f"Faltan columnas requeridas: {set(columnas_entrada) - set(df.columns)}. Verifica el archivo.")
     
-        # Revisar si todas las columnas necesarias están presentes
-        if set(columnas_entrada).issubset(df.columns):
-            df = df[columnas_entrada]  # Seleccionar solo las columnas de entrada
-            
-            # Escalar los datos de entrada
-            X_scaled = scaler_X.transform(df.values)
-            X_tensor = torch.tensor(X_scaled, dtype=torch.float32)
-    
-            # Realizar predicciones escaladas
-            with torch.no_grad():
-                y_scaled_pred = modelo(X_tensor).numpy().flatten()
-    
-            # Desescalar las predicciones
-            y_pred_desescalado = scaler_y.inverse_transform(y_scaled_pred.reshape(-1, 1)).flatten()
-    
-            # Agregar predicciones al DataFrame
-            df["Producción Total Estimada"] = y_pred_desescalado
-    
-            # Guardar el DataFrame con predicciones en un archivo Excel
-            output = io.BytesIO()
-            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                df.to_excel(writer, index=False, sheet_name="Predicciones")
-            output.seek(0)
-    
-            # Botón para descargar el archivo Excel
-            st.download_button(
-                label="Descargar Excel con predicciones",
-                data=output,
-                file_name="predicciones.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
-    
-            st.success("Predicciones generadas con éxito. Descarga el archivo con el botón de arriba.")
-        else:
-            st.error(f"Faltan columnas requeridas: {set(columnas_entrada) - set(df.columns)}. Verifica el archivo.")
-
 

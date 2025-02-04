@@ -148,8 +148,8 @@ elif pagina == "Predecir":
             )
     
             st.success("Predicciones generadas con éxito. Descarga el archivo con el botón de arriba.")
-    else:
-        st.error(f"Faltan columnas requeridas: {set(columnas_entrada) - set(df.columns)}. Verifica el archivo.")
+        else:
+            st.error(f"Faltan columnas requeridas: {set(columnas_entrada) - set(df.columns)}. Verifica el archivo.")
 
     
 

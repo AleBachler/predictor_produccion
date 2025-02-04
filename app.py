@@ -99,7 +99,8 @@ if pagina == "¿Cómo funciona?":
 
 # Página: Predecir
 elif pagina == "Predecir":
-    st.title("Sube tu archivo para predecir")
+    st.title("Predicción de Producción Total")
+    st.write("Sube un archivo Excel con los datos de entrada para obtener las predicciones.")
 
     # Cargar archivo Excel
     archivo = st.file_uploader("Sube un archivo Excel", type=["xls", "xlsx"])

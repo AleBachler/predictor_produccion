@@ -5,6 +5,8 @@ import pandas as pd
 import io
 from thefuzz import process  # Fuzzy matching para reconocer columnas similares
 from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Definir la red neuronal
 class Red(nn.Module):
@@ -69,7 +71,7 @@ modelo.eval()
 
 # Menú lateral
 st.sidebar.title("Menú")
-pagina = st.sidebar.radio("Seleccione una opción:", ["¿Cómo funciona?", "Predecir"])
+pagina = st.sidebar.radio("Seleccione una opción:", ["¿Cómo funciona?", "Predecir", "Estadísticas"])
 
 # Página: ¿Cómo funciona?
 if pagina == "¿Cómo funciona?":
@@ -148,8 +150,36 @@ elif pagina == "Predecir":
             )
     
             st.success("Predicciones generadas con éxito. Descarga el archivo con el botón de arriba.")
-        else:
-            st.error(f"Faltan columnas requeridas: {set(columnas_entrada) - set(df.columns)}. Verifica el archivo.")
+            
+            # Botón para ir a la página de estadísticas
+            if st.button("Ver Estadísticas"):
+                st.session_state.pagina = "Estadísticas"  # Redirigir a la pestaña de estadísticas
+
+# Página: Estadísticas
+elif pagina == "Estadísticas":
+    st.title("Estadísticas de los Datos")
+    
+    if 'df' in st.session_state:
+        # Histograma de una variable (por ejemplo, Producción Total Estimada)
+        st.subheader("Histograma de Producción Total Estimada")
+        fig, ax = plt.subplots()
+        ax.hist(st.session_state.df["Producción Total Estimada"], bins=30, color='skyblue', edgecolor='black')
+        ax.set_xlabel("Producción Total Estimada")
+        ax.set_ylabel("Frecuencia")
+        st.pyplot(fig)
+        
+        # Comportamiento de la producción a lo largo del tiempo (si existe una columna temporal)
+        if "Fecha" in st.session_state.df.columns:
+            st.subheader("Comportamiento de Producción a lo Largo del Tiempo")
+            fig, ax = plt.subplots()
+            st.session_state.df.groupby("Fecha")["Producción Total Estimada"].mean().plot(ax=ax)
+            ax.set_xlabel("Fecha")
+            ax.set_ylabel("Producción Promedio")
+            st.pyplot(fig)
+            
+    else:
+        st.warning("Primero debes subir un archivo para generar las predicciones.")
+
 
     
 

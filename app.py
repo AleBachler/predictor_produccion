@@ -105,22 +105,32 @@ elif pagina == "Predecir":
     archivo = st.file_uploader("Sube un archivo Excel", type=["xls", "xlsx"])
 
     if archivo:
-        df = pd.read_excel(archivo)
-        
-        # Convertir a formato numérico
-        df = df.apply(pd.to_numeric, errors='coerce')
+    df = pd.read_excel(archivo)
+    df = convertir_objetos_a_numerico(df)
 
-        # Escalar los datos (ajusta con los datos usados en el entrenamiento)
-        scaler_X = StandardScaler()
-        X_scaled = scaler_X.fit_transform(df.values)
+    # Validar y corregir nombres de columnas
+    columnas_corregidas = corregir_nombres_columnas(df.columns, columnas_entrada)
+    
+    # Aplicar los nombres corregidos
+    df.rename(columns=columnas_corregidas, inplace=True)
+    
+    # Revisar si todas las columnas necesarias están presentes
+    if set(columnas_entrada).issubset(df.columns):
+        df = df[columnas_entrada]  # Seleccionar solo las columnas de entrada
+        
+        # Escalar los datos de entrada
+        X_scaled = scaler_X.transform(df.values)
         X_tensor = torch.tensor(X_scaled, dtype=torch.float32)
 
-        # Hacer predicciones
+        # Realizar predicciones escaladas
         with torch.no_grad():
-            y_pred = modelo(X_tensor).numpy().flatten()
+            y_scaled_pred = modelo(X_tensor).numpy().flatten()
 
-        # Crear DataFrame con predicciones
-        df["Producción Total Estimada"] = y_pred
+        # Desescalar las predicciones
+        y_pred_desescalado = scaler_y.inverse_transform(y_scaled_pred.reshape(-1, 1)).flatten()
+
+        # Agregar predicciones al DataFrame
+        df["Producción Total Estimada"] = y_pred_desescalado
 
         # Guardar el DataFrame con predicciones en un archivo Excel
         output = io.BytesIO()
@@ -137,5 +147,7 @@ elif pagina == "Predecir":
         )
 
         st.success("Predicciones generadas con éxito. Descarga el archivo con el botón de arriba.")
+    else:
+        st.error(f"Faltan columnas requeridas: {set(columnas_entrada) - set(df.columns)}. Verifica el archivo.")
 
 

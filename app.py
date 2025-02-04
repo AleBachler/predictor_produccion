@@ -110,7 +110,7 @@ elif pagina == "Predecir":
 
             if st.button("Ver Estadísticas"):
                 st.session_state.pagina = "Estadísticas"
-                st.experimental_rerun()
+                st.rerun()
 
 elif pagina == "Estadísticas":
     st.title("Estadísticas de los Datos")

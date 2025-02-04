@@ -6,3 +6,4 @@ thefuzz
 xlsxwriter
 openpyxl
 matplotlib
+seaborn

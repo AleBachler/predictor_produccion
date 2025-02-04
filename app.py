@@ -6,7 +6,7 @@ import io
 from thefuzz import process  # Fuzzy matching para reconocer columnas similares
 from sklearn.preprocessing import StandardScaler
 
-# Definir la red neuronal
+ Definir la red neuronal
 class Red(nn.Module):
     def __init__(self, n_entradas):
         super(Red, self).__init__()
@@ -27,8 +27,42 @@ class Red(nn.Module):
         output = self.linear3(x)
         return output
 
+# Función para convertir valores de texto en números
+def convertir_objetos_a_numerico(df):
+    for col in df.select_dtypes(include=['object']).columns:
+        df[col] = df[col].str.replace(',', '.', regex=True)  # Reemplazar comas por puntos
+        df[col] = df[col].str.strip()  # Eliminar espacios en blanco
+        df[col] = pd.to_numeric(df[col], errors='coerce')  # Convertir a numérico
+    return df
+
+# Función para corregir nombres de columnas usando fuzzy matching
+def corregir_nombres_columnas(columnas_usuario, columnas_correctas):
+    columnas_corregidas = {}
+    for col in columnas_usuario:
+        match, score = process.extractOne(col, columnas_correctas)  # Encuentra la mejor coincidencia
+        if score > 80:  # Umbral de similitud (ajustable)
+            columnas_corregidas[col] = match
+    return columnas_corregidas
+
+# Cargar dataset de referencia para obtener estadísticas de escalado
+file_path = "produccion_limpia.csv"
+data = pd.read_csv(file_path, sep=";")
+data = convertir_objetos_a_numerico(data)
+
+columnas_entrada = [col for col in data.columns if col != "Prod. Total"]
+n_entradas = len(columnas_entrada)
+
+# Escalado de datos
+scaler_X = StandardScaler()
+scaler_y = StandardScaler()
+
+X_train = data[columnas_entrada].values
+y_train = data["Prod. Total"].values.reshape(-1, 1)
+
+scaler_X.fit(X_train)
+scaler_y.fit(y_train)
+
 # Cargar modelo entrenado
-n_entradas = 5  # Ajusta esto según tu dataset
 modelo = Red(n_entradas)
 modelo.load_state_dict(torch.load("modelo_entrenado.pth"))
 modelo.eval()

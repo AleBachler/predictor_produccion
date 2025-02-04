@@ -6,7 +6,7 @@ import io
 from thefuzz import process  # Fuzzy matching para reconocer columnas similares
 from sklearn.preprocessing import StandardScaler
 
- Definir la red neuronal
+# Definir la red neuronal
 class Red(nn.Module):
     def __init__(self, n_entradas):
         super(Red, self).__init__()

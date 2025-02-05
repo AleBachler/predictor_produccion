@@ -75,7 +75,25 @@ if pagina == "¿Cómo funciona?":
     st.title("¿Cómo funciona?")
     st.markdown("""
     ## Descripción de la Aplicación
-    ...
+    
+    Esta aplicación implementa una red neuronal en **PyTorch** para resolver un problema de regresión. Su objetivo es predecir una variable numérica a partir de un conjunto de datos estructurados. La arquitectura de la red está diseñada para mejorar la precisión y la estabilidad del entrenamiento mediante varias técnicas avanzadas.
+    
+    ### 🛠️ Características principales:
+    - **🔗 Red Neuronal Profunda**: Arquitectura de tres capas con 128 y 64 neuronas ocultas.
+    - **🛡️ Regularización**: Uso de **Batch Normalization** y **Dropout** para evitar sobreajuste.
+    - **⚡ Optimización Avanzada**: Optimización con **Adam** y ajuste de tasa de aprendizaje con **ReduceLROnPlateau**.
+    - **📏 Escalado de Datos**: Normalización de variables predictoras y de la variable objetivo.
+    - **📊 Evaluación Continua**: Cálculo de **MSE (Error Cuadrático Medio)** y **R² (Coeficiente de Determinación)** en el conjunto de prueba.
+    - **💾 Almacenamiento de Resultados**: Historial de entrenamiento y predicciones guardadas en un archivo CSV.
+    
+    ### 🔄 Flujo de la Aplicación:
+    1. **Preprocesamiento de Datos**: Normalización de variables y división en entrenamiento/prueba.
+    2. **Entrenamiento del Modelo**: Uso de descenso de gradiente con retropropagación.
+    3. **Evaluación y Ajuste**: Medición del rendimiento en prueba y ajuste dinámico de la tasa de aprendizaje.
+    4. **Predicciones Finales**: Desescalado de predicciones y almacenamiento en un archivo para interpretación.
+    
+    ---
+    📌 *Desarrollado con PyTorch y Streamlit*
     """)
 
 elif pagina == "Predecir":

@@ -80,12 +80,12 @@ if pagina == "¿Cómo funciona?":
     Esta aplicación implementa una red neuronal en **PyTorch** para resolver un problema de regresión. Su objetivo es predecir una variable numérica a partir de un conjunto de datos estructurados. La arquitectura de la red está diseñada para mejorar la precisión y la estabilidad del entrenamiento mediante varias técnicas avanzadas.
     
     ### Características principales:
-    - **Red Neuronal Profunda**: Arquitectura de tres capas con 128 y 64 neuronas ocultas.
-    - **Regularización**: Uso de **Batch Normalization** y **Dropout** para evitar sobreajuste.
-    - **Optimización Avanzada**: Optimización con **Adam** y ajuste de tasa de aprendizaje con **ReduceLROnPlateau**.
-    - **Escalado de Datos**: Normalización de variables predictoras y de la variable objetivo.
-    - **Evaluación Continua**: Cálculo de **MSE (Error Cuadrático Medio)** y **R² (Coeficiente de Determinación)** en el conjunto de prueba.
-    - **Almacenamiento de Resultados**: Historial de entrenamiento y predicciones guardadas en un archivo CSV.
+    - **Red Neuronal Profunda**: Arquitectura de tres capas densas con 128 y 64 neuronas ocultas, función de activación ReLU.
+    - **Regularización**: Uso de Batch Normalization y Dropout en capas ocultas para mejorar estabilidad y evitar sobreajuste.
+    - **Optimización Avanzada**: Optimización con Adam y ajuste dinámico de tasa de aprendizaje con ReduceLROnPlateau.
+    - **Escalado de Datos**: Normalización de variables predictoras con (MinMaxScaler / StandardScaler / otra técnica). Variable objetivo también normalizada y desnormalizada al final.
+    - **Evaluación Continua**: Cálculo de MSE y R² en el conjunto de prueba para medir rendimiento.
+    - **Almacenamiento de Resultados**: Guardado de historial de entrenamiento, predicciones y pesos del modelo en CSV para análisis posterior.
     
     ### Flujo de la Aplicación:
     1. **Preprocesamiento de Datos**: Normalización de variables y división en entrenamiento/prueba.

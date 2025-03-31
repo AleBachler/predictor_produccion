@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import pandas as pd
 import io
-from thefuzz import process  # Fuzzy matching para reconocer columnas similares
+from thefuzz import process
 from sklearn.preprocessing import StandardScaler
 
 # Definir la red neuronal
@@ -30,17 +30,17 @@ class Red(nn.Module):
 # Función para convertir valores de texto en números
 def convertir_objetos_a_numerico(df):
     for col in df.select_dtypes(include=['object']).columns:
-        df[col] = df[col].str.replace(',', '.', regex=True)  # Reemplazar comas por puntos
-        df[col] = df[col].str.strip()  # Eliminar espacios en blanco
-        df[col] = pd.to_numeric(df[col], errors='coerce')  # Convertir a numérico
+        df[col] = df[col].str.replace(',', '.', regex=True)
+        df[col] = df[col].str.strip()
+        df[col] = pd.to_numeric(df[col], errors='coerce')
     return df
 
-# Función para corregir nombres de columnas usando fuzzy matching
+# Función para corregir nombres de columnas
 def corregir_nombres_columnas(columnas_usuario, columnas_correctas):
     columnas_corregidas = {}
     for col in columnas_usuario:
-        match, score = process.extractOne(col, columnas_correctas)  # Encuentra la mejor coincidencia
-        if score > 80:  # Umbral de similitud (ajustable)
+        match, score = process.extractOne(col, columnas_correctas)
+        if score > 80:
             columnas_corregidas[col] = match
     return columnas_corregidas
 
@@ -49,10 +49,10 @@ file_path = "produccion_limpia.csv"
 data = pd.read_csv(file_path, sep=";")
 data = convertir_objetos_a_numerico(data)
 
-columnas_entrada = [col for col in data.columns if col != "Prod. Total"]
+columnas_entrada = [col for col in data.columns if col.lower() not in ["prod. total", "producción total"]]
 n_entradas = len(columnas_entrada)
 
-# Escalado de datos
+# Escalar datos
 scaler_X = StandardScaler()
 scaler_y = StandardScaler()
 
@@ -71,7 +71,7 @@ modelo.eval()
 st.sidebar.title("Menú")
 pagina = st.sidebar.radio("Seleccione una opción:", ["¿Cómo funciona?", "Predecir"])
 
-# Página: ¿Cómo funciona?
+# Página de información
 if pagina == "¿Cómo funciona?":
     st.title("¿Cómo funciona?")
     st.markdown("""
@@ -97,59 +97,47 @@ if pagina == "¿Cómo funciona?":
     📌 *Desarrollado con PyTorch y Streamlit*
     """)
 
-# Página: Predecir
+# Página de predicción
 elif pagina == "Predecir":
     st.title("Predicción de Producción Total")
-    st.write("Sube un archivo Excel con los datos de entrada para obtener las predicciones.")
-
-    # Cargar archivo Excel
     archivo = st.file_uploader("Sube un archivo Excel", type=["xls", "xlsx"])
 
     if archivo:
         df = pd.read_excel(archivo)
         df = convertir_objetos_a_numerico(df)
-    
-        # Validar y corregir nombres de columnas
-        columnas_corregidas = corregir_nombres_columnas(df.columns, columnas_entrada)
         
-        # Aplicar los nombres corregidos
+        columnas_corregidas = corregir_nombres_columnas(df.columns, columnas_entrada)
         df.rename(columns=columnas_corregidas, inplace=True)
         
-        # Revisar si todas las columnas necesarias están presentes
-        if set(columnas_entrada).issubset(df.columns):
-            df = df[columnas_entrada]  # Seleccionar solo las columnas de entrada
-            
-            # Escalar los datos de entrada
+        df = df[[col for col in columnas_entrada if col in df.columns]]
+        
+        faltantes = set(columnas_entrada) - set(df.columns)
+        if faltantes:
+            st.error(f"Faltan columnas requeridas: {faltantes}. Verifica el archivo.")
+        else:
             X_scaled = scaler_X.transform(df.values)
             X_tensor = torch.tensor(X_scaled, dtype=torch.float32)
-    
-            # Realizar predicciones escaladas   
+            
             with torch.no_grad():
                 y_scaled_pred = modelo(X_tensor).numpy().flatten()
-    
-            # Desescalar las predicciones
+            
             y_pred_desescalado = scaler_y.inverse_transform(y_scaled_pred.reshape(-1, 1)).flatten()
-    
-            # Agregar predicciones al DataFrame
             df["Producción Total Estimada"] = y_pred_desescalado
-    
-            # Guardar el DataFrame con predicciones en un archivo Excel
+            
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
                 df.to_excel(writer, index=False, sheet_name="Predicciones")
             output.seek(0)
-    
-            # Botón para descargar el archivo Excel
+            
             st.download_button(
                 label="Descargar Excel con predicciones",
                 data=output,
                 file_name="predicciones.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
-    
+            
             st.success("Predicciones generadas con éxito. Descarga el archivo con el botón de arriba.")
-        else:
-            st.error(f"Faltan columnas requeridas: {set(columnas_entrada) - set(df.columns)}. Verifica el archivo.")
+
 
 
 

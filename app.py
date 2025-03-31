@@ -49,8 +49,7 @@ file_path = "produccion_limpia.csv"
 data = pd.read_csv(file_path, sep=";")
 data = convertir_objetos_a_numerico(data)
 
-# Definir columnas de entrada sin "Total Astillado"
-columnas_entrada = [col for col in data.columns if col not in ["Prod. Total", "Total Astillado"]]
+columnas_entrada = [col for col in data.columns if col != "Prod. Total"]
 n_entradas = len(columnas_entrada)
 
 # Escalado de datos
@@ -76,19 +75,19 @@ pagina = st.sidebar.radio("Seleccione una opción:", ["¿Cómo funciona?", "Pred
 if pagina == "¿Cómo funciona?":
     st.title("¿Cómo funciona?")
     st.markdown("""
-     ## Descripción de la Aplicación
+    ## Descripción de la Aplicación
     
     Esta aplicación implementa una red neuronal en **PyTorch** para resolver un problema de regresión. Su objetivo es predecir una variable numérica a partir de un conjunto de datos estructurados. La arquitectura de la red está diseñada para mejorar la precisión y la estabilidad del entrenamiento mediante varias técnicas avanzadas.
     
-    ### Características principales:
-    - **Red Neuronal Profunda**: Arquitectura de tres capas densas con 128 y 64 neuronas ocultas, función de activación ReLU.
-    - **Regularización**: Uso de Batch Normalization y Dropout en capas ocultas para mejorar estabilidad y evitar sobreajuste.
-    - **Optimización Avanzada**: Optimización con Adam y ajuste dinámico de tasa de aprendizaje con ReduceLROnPlateau.
-    - **Escalado de Datos**: Normalización de variables predictoras con (MinMaxScaler / StandardScaler / otra técnica). Variable objetivo también normalizada y desnormalizada al final.
-    - **Evaluación Continua**: Cálculo de MSE y R² en el conjunto de prueba para medir rendimiento.
-    - **Almacenamiento de Resultados**: Guardado de historial de entrenamiento, predicciones y pesos del modelo en CSV para análisis posterior.
+    ### 🛠️ Características principales:
+    - **🔗 Red Neuronal Profunda**: Arquitectura de tres capas con 128 y 64 neuronas ocultas.
+    - **🛡️ Regularización**: Uso de **Batch Normalization** y **Dropout** para evitar sobreajuste.
+    - **⚡ Optimización Avanzada**: Optimización con **Adam** y ajuste de tasa de aprendizaje con **ReduceLROnPlateau**.
+    - **📏 Escalado de Datos**: Normalización de variables predictoras y de la variable objetivo.
+    - **📊 Evaluación Continua**: Cálculo de **MSE (Error Cuadrático Medio)** y **R² (Coeficiente de Determinación)** en el conjunto de prueba.
+    - **💾 Almacenamiento de Resultados**: Historial de entrenamiento y predicciones guardadas en un archivo CSV.
     
-    ### Flujo de la Aplicación:
+    ### 🔄 Flujo de la Aplicación:
     1. **Preprocesamiento de Datos**: Normalización de variables y división en entrenamiento/prueba.
     2. **Entrenamiento del Modelo**: Uso de descenso de gradiente con retropropagación.
     3. **Evaluación y Ajuste**: Medición del rendimiento en prueba y ajuste dinámico de la tasa de aprendizaje.

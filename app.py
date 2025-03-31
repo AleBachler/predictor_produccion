@@ -95,7 +95,7 @@ if pagina == "¿Cómo funciona?":
     
     ---
     📌 *Desarrollado con PyTorch y Streamlit*
-    """))
+    """)
 
 # Página: Predecir
 elif pagina == "Predecir":
